@@ -174,7 +174,7 @@ const unsigned long MODE_SAVE_DELAY = 3000L;
 /* Also indicate the video mode with a single led. It is blinked 1-3 times
  * according to which mode is set (1 is EUR, see enum VideoMode below).
  */
-#define MODE_LED_SINGLE_PIN 8
+//#define MODE_LED_SINGLE_PIN 8
 
 /* Presses of the reset button longer than this amount of milliseconds will
  * switch to the next mode, shorter presses will reset the console.
@@ -231,9 +231,10 @@ const int TRIANGLE = 0x2002;
 // AD9834 75Mhz == 75000000.0
 const float refFreq = 25000000.0;
 
-const int FSYNC = 10;                        // Standard SPI pins for the AD9833/4 waveform generators.
-const int CLK = 13;
-const int DATA = 11;
+#define PAUSE 8
+#define FSYNC 10                       // Standard SPI pins for the AD9833/4 waveform generators.
+#define CLK 13
+#define DATA 11
 
 const unsigned long freq_step =   500000;
 const unsigned long min_freq  =  7000000;               // Set min frequency. 8Mhz
@@ -544,12 +545,16 @@ void setup () {
 	 */
 #ifdef OVERCLOCK
   SPI.begin();
+  fastPinMode(DEBUG_LED, OUTPUT);
+  fastDigitalWrite(DEBUG_LED, HIGH);
+  fastPinMode(PAUSE, OUTPUT);
+  fastDigitalWrite(PAUSE, LOW);
   delay(50);
   AD9833reset();
   delay(50);
   AD9833setFrequency(freq, SQUARE);
-  fastPinMode(DEBUG_LED, OUTPUT);
-  fastDigitalWrite(DEBUG_LED, HIGH);
+  fastDigitalWrite(PAUSE, HIGH);
+  
 #endif
 	noInterrupts ();
 	fastPinMode (VIDEOMODE_PIN, OUTPUT);
@@ -920,35 +925,47 @@ inline void handle_pad () {
 #endif
 #ifdef FREQ_DOWN_COMBO
     } else if ((pad_status & FREQ_UP_COMBO) == FREQ_UP_COMBO) {
-      fastDigitalWrite (DEBUG_LED, LOW);
-      delay (100);
-      fastDigitalWrite (DEBUG_LED, HIGH);
-      debugln (F("rise the cpu clock 0.5 Mhz"));
-      freq -= freq_step;
-      if (freq < min_freq) {
-        fastDigitalWrite (DEBUG_LED, LOW);
+      fastDigitalWrite (PAUSE, LOW);
+      if (freq > min_freq){
+        fastDigitalWrite(DEBUG_LED, LOW);
         delay (100);
-        fastDigitalWrite (DEBUG_LED, HIGH);
+        fastDigitalWrite(DEBUG_LED, HIGH);
+        debugln (F("low the cpu clock 0.5 Mhz"));
+        freq -= freq_step;
+        delay (100);
+      }
+      else {
+        fastDigitalWrite(DEBUG_LED, LOW);
+        delay (100);
+        fastDigitalWrite(DEBUG_LED, HIGH);
         freq = min_freq;
+        delay (100);
       }
       AD9833setFrequency(freq, SQUARE);
       last_combo_time = millis();
+      fastDigitalWrite (PAUSE, HIGH);
 #endif
 #ifdef FREQ_UP_COMBO
     } else if ((pad_status & FREQ_DOWN_COMBO) == FREQ_DOWN_COMBO) {
-      fastDigitalWrite (DEBUG_LED, LOW);
-      delay (100);
-      fastDigitalWrite (DEBUG_LED, HIGH);
-      debugln (F("low the cpu clock 0.5 Mhz"));
-      freq += freq_step;
-      if (freq > max_freq) {
-        fastDigitalWrite (DEBUG_LED, LOW);
+      fastDigitalWrite (PAUSE, LOW);
+      if (freq <= max_freq){        
+        fastDigitalWrite(DEBUG_LED, LOW);
         delay (100);
-        fastDigitalWrite (DEBUG_LED, HIGH);
+        fastDigitalWrite(DEBUG_LED, HIGH);
+        delay (100);
+        debugln (F("rise the cpu clock 0.5 Mhz"));
+        freq += freq_step;
+      }
+      else {
+        fastDigitalWrite(DEBUG_LED, LOW);
+        delay (100);
+        fastDigitalWrite(DEBUG_LED, HIGH);
+        delay (100);
         freq = max_freq;
       }
       AD9833setFrequency(freq, SQUARE);
       last_combo_time = millis();
+      fastDigitalWrite (PAUSE, HIGH);
 #endif
     }
   }
