@@ -2,7 +2,7 @@
    This file is part of MegaDrive++.
 
    Copyright (C) 2015-2019 by SukkoPera <software@sukkology.net>
-   
+
    MegaDrive++ is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
@@ -125,8 +125,8 @@ enum __attribute__ ((__packed__)) PadButton {
 
 #ifdef OVERCLOCK
 
-#define FREQ_DOWN_COMBO MD_BTN_A
-#define FREQ_UP_COMBO MD_BTN_C
+#define FREQ_UP_COMBO MD_BTN_A
+#define FREQ_DOWN_COMBO MD_BTN_C
 
 #endif
 
@@ -229,6 +229,7 @@ const int TRIANGLE = 0x2002;
 // internal reference
 // AD9833 25Mhz == 25000000.0
 // AD9834 75Mhz == 75000000.0
+
 //const float refFreq = 25000000.0;
 const float refFreq = 75000000.0;
 
@@ -239,9 +240,9 @@ const float refFreq = 75000000.0;
 
 const unsigned long freq_step =   500000;
 const unsigned long min_freq  =  7000000;               // Set min frequency. 8Mhz
-const unsigned long max_freq  = 12500000;               // Set max frequency. 12.5Mhz
+const unsigned long max_freq  = 12000000;               // Set max frequency. 12.5Mhzq
 
-unsigned long freq = 7000000;               // Set initial frequency.
+unsigned long freq = 8000000;               // Set initial frequency.
 
 #endif
 
@@ -910,63 +911,82 @@ inline void handle_pad () {
     } else if ((pad_status & EUR_COMBO) == EUR_COMBO) {
       debugln (F("EUR mode combo detected"));
       set_mode (EUR, true);
+      fastDigitalWrite(DEBUG_LED, LOW);
+      delay(60);
+      fastDigitalWrite(DEBUG_LED, HIGH);
       last_combo_time = millis ();
 #endif
 #ifdef USA_COMBO
     } else if ((pad_status & USA_COMBO) == USA_COMBO) {
       debugln (F("USA mode combo detected"));
       set_mode (USA, true);
+      fastDigitalWrite(DEBUG_LED, LOW);
+      delay(60);
+      fastDigitalWrite(DEBUG_LED, HIGH);
       last_combo_time = millis ();
 #endif
 #ifdef JAP_COMBO
     } else if ((pad_status & JAP_COMBO) == JAP_COMBO) {
       debugln (F("JAP mode combo detected"));
       set_mode (JAP, true);
+      fastDigitalWrite(DEBUG_LED, LOW);
+      delay(60);
+      fastDigitalWrite(DEBUG_LED, HIGH);
       last_combo_time = millis ();
 #endif
-#ifdef FREQ_DOWN_COMBO
-    } else if ((pad_status & FREQ_UP_COMBO) == FREQ_UP_COMBO) {
-      fastDigitalWrite (PAUSE, LOW);
-      if (freq > min_freq) {
-        fastDigitalWrite(DEBUG_LED, LOW);
-        delay (100);
-        fastDigitalWrite(DEBUG_LED, HIGH);
-        debugln (F("low the cpu clock 0.5 Mhz"));
-        freq -= freq_step;
-        delay (100);
-      }
-      else {
-        fastDigitalWrite(DEBUG_LED, LOW);
-        delay (100);
-        fastDigitalWrite(DEBUG_LED, HIGH);
-        freq = min_freq;
-        delay (100);
-      }
-      AD9833setFrequency(freq, SQUARE);
-      last_combo_time = millis();
-      fastDigitalWrite (PAUSE, HIGH);
-#endif
 #ifdef FREQ_UP_COMBO
-    } else if ((pad_status & FREQ_DOWN_COMBO) == FREQ_DOWN_COMBO) {
-      fastDigitalWrite (PAUSE, LOW);
-      if (freq <= max_freq) {
+    } else if ((pad_status & FREQ_UP_COMBO) == FREQ_UP_COMBO) {
+
+      if (freq == max_freq){
         fastDigitalWrite(DEBUG_LED, LOW);
-        delay (100);
+        delay(60);
         fastDigitalWrite(DEBUG_LED, HIGH);
-        delay (100);
-        debugln (F("rise the cpu clock 0.5 Mhz"));
+        delay(60);
+        fastDigitalWrite(DEBUG_LED, LOW);
+        delay(60);
+        fastDigitalWrite(DEBUG_LED, HIGH);
+      }
+      
+      else if (freq < max_freq){
+        
         freq += freq_step;
-      }
-      else {
         fastDigitalWrite(DEBUG_LED, LOW);
-        delay (100);
+        delay(60);
         fastDigitalWrite(DEBUG_LED, HIGH);
-        delay (100);
-        freq = max_freq;
+        
+        fastDigitalWrite(PAUSE, LOW);
+        AD9833setFrequency(freq, SQUARE);
+        fastDigitalWrite(PAUSE, HIGH);
       }
-      AD9833setFrequency(freq, SQUARE);
+      
       last_combo_time = millis();
-      fastDigitalWrite (PAUSE, HIGH);
+#endif
+#ifdef FREQ_DOWN_COMBO
+    } else if ((pad_status & FREQ_DOWN_COMBO) == FREQ_DOWN_COMBO) {
+
+      if (freq == min_freq){
+        fastDigitalWrite(DEBUG_LED, LOW);
+        delay(60);
+        fastDigitalWrite(DEBUG_LED, HIGH);
+        delay(60);
+        fastDigitalWrite(DEBUG_LED, LOW);
+        delay(60);
+        fastDigitalWrite(DEBUG_LED, HIGH);
+      }
+      
+      else if (freq > min_freq){
+        freq -= freq_step;
+        
+        fastDigitalWrite(DEBUG_LED, LOW);
+        delay(60);
+        fastDigitalWrite(DEBUG_LED, HIGH);
+        
+        fastDigitalWrite(PAUSE, LOW);
+        AD9833setFrequency(freq, SQUARE);
+        fastDigitalWrite(PAUSE, HIGH);
+      }
+      
+      last_combo_time = millis();
 #endif
     }
   }
