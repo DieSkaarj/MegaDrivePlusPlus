@@ -148,7 +148,7 @@ enum __attribute__ ((__packed__)) PadButton {
    This should make startup faster and hopefully will solve problems with Virtua
    Racing or Ecco The Dolphin (See issue #5 on GitHub).
 */
-//~ #define ENABLE_FAST_IO
+#define ENABLE_FAST_IO
 
 // Offset in the EEPROM at which the current mode should be saved
 #define MODE_ROM_OFFSET 42
@@ -240,7 +240,7 @@ const float refFreq = 75000000.0;
 
 const unsigned long freq_step =   500000;
 const unsigned long min_freq  =  7000000;               // Set min frequency. 8Mhz
-const unsigned long max_freq  = 12000000;               // Set max frequency. 12.5Mhzq
+const unsigned long max_freq  = 10500000;               // Set max frequency. 12.5Mhzq
 
 unsigned long freq = 8000000;               // Set initial frequency.
 
@@ -911,29 +911,36 @@ inline void handle_pad () {
     } else if ((pad_status & EUR_COMBO) == EUR_COMBO) {
       debugln (F("EUR mode combo detected"));
       set_mode (EUR, true);
+#ifdef OVERCLOCK
       fastDigitalWrite(DEBUG_LED, LOW);
       delay(60);
       fastDigitalWrite(DEBUG_LED, HIGH);
       last_combo_time = millis ();
+#endif
 #endif
 #ifdef USA_COMBO
     } else if ((pad_status & USA_COMBO) == USA_COMBO) {
       debugln (F("USA mode combo detected"));
       set_mode (USA, true);
+#ifdef OVERCLOCK
       fastDigitalWrite(DEBUG_LED, LOW);
       delay(60);
       fastDigitalWrite(DEBUG_LED, HIGH);
       last_combo_time = millis ();
+#endif
 #endif
 #ifdef JAP_COMBO
     } else if ((pad_status & JAP_COMBO) == JAP_COMBO) {
       debugln (F("JAP mode combo detected"));
       set_mode (JAP, true);
+#ifdef OVERCLOCK
       fastDigitalWrite(DEBUG_LED, LOW);
       delay(60);
       fastDigitalWrite(DEBUG_LED, HIGH);
       last_combo_time = millis ();
 #endif
+#endif
+#ifdef OVERCLOCK
 #ifdef FREQ_UP_COMBO
     } else if ((pad_status & FREQ_UP_COMBO) == FREQ_UP_COMBO) {
 
@@ -987,6 +994,7 @@ inline void handle_pad () {
       }
       
       last_combo_time = millis();
+#endif
 #endif
     }
   }
