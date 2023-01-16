@@ -24,7 +24,7 @@
  * https://github.com/SukkoPera/MegaDrivePlusPlus
  */
 
-/* Arduino Nano:
+/* MH-ATtiny88:
  *
  *                             +-------+                
  *              +--------------|  USB  |--------------+ 
