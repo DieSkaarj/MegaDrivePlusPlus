@@ -635,7 +635,7 @@ void setup_pad () {
 	 * going to be bare
 	 */
 	EICRA |= (1 << ISC00);    // Trigger interrupt on CHANGE
-	EIMSK |= (1 << INT0);     // Enable interrupt 0 (i.e.: on pin 2)
+	EIMSK |= (1 << INT1);     // Enable interrupt 0 (i.e.: on pin 2)
 	interrupts ();            // Enable all interrupts, probably redundant
 }
 
@@ -694,8 +694,8 @@ word read_pad () {
 	 *
 	 * Note that bit 2 in all of these is the SELECT line.
 	 */
-	byte b1 = ~g_buttons_1;     // Select HIGH......: UDLRBxxC
-	byte b2 = ~g_buttons_2;     // Select LOW.......: UDxxAxxS
+	byte b1 = ~g_buttons_1;     // Select HIGH......: UDLRxBCx
+	byte b2 = ~g_buttons_2;     // Select LOW.......: UDxxxASx
 	byte b3 = ~g_buttons_3;     // Select PULSE-3...: ZYXMxxxx
 
 	/* Compose all bytes into a single word, respecting the order in PadButton.
@@ -706,8 +706,8 @@ word read_pad () {
 	 * It would be great to eliminate the problem completely, but we still
 	 * haven't found a way :(.
 	 */
-	word buttons = (b1 & 0x38) | ((b1 & 0x01) << 2)
-	             | (b2 & 0xC0) | ((b2 & 0x08) >> 2) | (b2 & 0x01)
+	word buttons = (b1 & 0x1A) | ((b1 & 0x02) << 2)
+	             | (b2 & 0xC0) | ((b2 & 0x04) >> 2) | (b2 & 0x01)
 	             | ((b3 & 0xF0) << 4)
 	             ;
 
