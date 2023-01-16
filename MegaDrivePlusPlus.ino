@@ -623,7 +623,7 @@ void setup_pad () {
 	/* Set port directions: All button lines are INPUTs
 	 * (Commented out since INPUT is the default state of pins at reset)
 	 */
-	//~ fastPinMode (0, INPUT);
+	//~ fastPinMode (1, INPUT);
 	//~ fastPinMode (2, INPUT);
 	//~ fastPinMode (3, INPUT);
 	//~ fastPinMode (4, INPUT);
