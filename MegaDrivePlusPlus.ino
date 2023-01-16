@@ -26,28 +26,27 @@
 
 /* Arduino Nano:
  *
- *                                 +-----+
- *                    +------------| USB |------------+
- *                    |            +-----+            |
- *     (Built-in LED) | [ ]D13/SCK        MISO/D12[ ] |
- *                    | [ ]3.3V           MOSI/D11[X]~| [LED Blue]
- *                    | [ ]V.ref     ___    SS/D10[X]~| [LED Green]
- *          Reset Out | [X]A0       / N \       D9[X]~| [LED Red]
- *           Reset In | [X]A1      /  A  \      D8[X] | [Single Pin Led]
- * JP3/4 (Video Mode) | [X]A2      \  N  /      D7[X] | Pad Port Pin 1
- *   JP1/2 (Language) | [X]A3       \_0_/       D6[X]~| Pad Port Pin 2
- *          [LCD SDA] | [X]A4/SDA               D5[X]~| Pad Port Pin 3
- *          [LCD SCL] | [X]A5/SCL               D4[X] | Pad Port Pin 4
- *                    | [ ]A6              INT1/D3[X]~| Pad Port Pin 6
- *                    | [ ]A7              INT0/D2[X] | Pad Port Pin 7
- *                +5V | [X]5V                  GND[X] | GND
- *                    | [ ]RST                 RST[ ] |
- *                    | [ ]GND   5V MOSI GND   TX1[ ] |
- *                    | [ ]Vin   [ ] [ ] [ ]   RX0[X] | Pad Port Pin 9
- *                    |          [ ] [ ] [ ]          |
- *                    |          MISO SCK RST         |
- *                    | NANO-V3                       |
- *                    +-------------------------------+
+ *                             +-------+                
+ *              +--------------|  USB  |--------------+ 
+ *              |              +-------+              | 
+ *              | [ ] 15                        14[ ] | 
+ *              | [ ] 16                    SCK 13[ ] | 
+ *              | [ ] A6                   MISO 12[ ] | 
+ *              | [ ] A7                   MOSI 11[*] | [LED Blue]
+ * Reset Out    | [*] A0                     SS 10[*]~| [LED Green]
+ * Reset In     | [*] A1                         9[*]~| [LED Red]
+ * JP3/4 (50/60)| [*] A2                         8[*] | [Single Pin LED]
+ * JP1/2 (JP/EN)| [*] A3                         7[*] | Pad Up (1)
+ * LCD SDA      | [*] A4/SDA                     6[*] | Pad Down (2)
+ * LCD SCL      | [*] A5/SCL                     5[*] | Pad Left (3)
+ *              | [ ] 25                         4[*] | Pad Right (4)
+ *              | [ ] RST                   INT1/3[*] | Pad Select (7)
+ *(Built in LED)| [ ] 0                         5V[*] | +5V
+ *Pad Start/C(9)| [*] 1      VCC  MOSI GND     GND[*] | GND
+ *Pad A/B (6)   | [*] 2/INT0 [ ]  [ ]  [ ]     VIN[ ] | 
+ *              |            [ ]  [ ]  [ ]            | 
+ *              |            MISO SCK  RST            | 
+ *             +--ATtiny88---------------------------+ 
  *
  * Connections of pins in square brackets are optional. All the others are
  * mandatory.
@@ -58,6 +57,7 @@
  *   us), so the ISR has very little time to complete. Thus we need to keep all
  *   button lines on the same port and only PORTD has enough pins on an
  *   ATmega328.
+ *   ### The following note is not relevant for the ATtiny88. ###
  * - Outputting debugging messages is useful, but unfortunately the hardware
  *   UART is right on PORTD on the 328. Actually we only need the TX pin
  *   (ATmega328 pin 3, mapped to pin 1 on an Arduino), so we keep that one free.
