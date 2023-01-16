@@ -35,11 +35,11 @@
 
 .section .text
 
-.global INT0_vect
+.global INT1_vect
 
 
 #define PAD_IOPORT _SFR_IO_ADDR (PIND)
-#define SEL_BIT PIND2
+#define SEL_BIT PIND3
 #define SIG_IOPORT _SFR_IO_ADDR (PORTB)
 #define SIG_BIT DDB4
 
@@ -59,7 +59,7 @@
 #define IO_TREG2 _SFR_IO_ADDR (GPIOR1)
 #define IO_TREG3 _SFR_IO_ADDR (GPIOR2)
 
-INT0_vect:	; Save context
+INT1_vect:	; Save context
 						out IO_TREG1, R_STATE
 						in R_STATE, _SFR_IO_ADDR (SREG)
 						out IO_TREG2, R_STATE
